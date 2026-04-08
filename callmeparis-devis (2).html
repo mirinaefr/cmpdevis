@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>callmeparis — 수강료 견적서</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #2E75B6;
+            --blue-dark: #1B4F8A;
+            --blue-light: #E8F1F8;
+            --blue-glow: #D5E8F0;
+            --dark: #1B2A4A;
+            --gold: #D4A843;
+            --gold-light: #FDF6E3;
+            --green: #2E8B57;
+            --green-light: #E0F2E9;
+            --red: #C0392B;
+            --gray-100: #F7F8FA;
+            --gray-200: #ECEEF1;
+            --gray-300: #D1D5DB;
+            --gray-500: #6B7280;
+            --gray-700: #374151;
+            --white: #FFFFFF;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 24px rgba(27, 42, 74, 0.08);
+            --shadow-hover: 0 8px 32px rgba(46, 117, 182, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(165deg, var(--gray-100) 0%, var(--blue-light) 50%, var(--gray-100) 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            padding: 16px;
+        }
+
+        #app {
+            max-width: 540px;
+            margin: 0 auto;
+            padding-bottom: 40px;
+        }
+
+        /* ── Header ── */
+        .header {
+            text-align: center;
+            padding: 32px 0 24px;
+        }
+        .header-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--blue);
+            letter-spacing: -0.5px;
+        }
+        .header-sub {
+            font-size: 13px;
+            color: var(--gray-500);
+            margin-top: 4px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ── Progress bar ── */
+        .progress-bar {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 28px;
+        }
+        .progress-segment {
+            flex: 1;
+            height: 3px;
+            border-radius: 2px;
+            background: var(--gray-200);
+            transition: background 0.4s ease;
+        }
+        .progress-segment.active {
+            background: var(--blue);
+        }
+        .progress-segment.done {
+            background: var(--blue-dark);
+        }
+
+        /* ── Step container ── */
+        .step-wrapper {
+            animation: fadeUp 0.35s ease-out;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--dark);
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+        .step-subtitle {
+            font-size: 14px;
+            color: var(--gray-500);
+            text-align: center;
+            margin-top: -12px;
+            margin-bottom: 20px;
+        }
+
+        /* ── Cards ── */
+        .cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .cards.grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .cards.grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .card {
+            background: var(--white);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            text-align: center;
+        }
+        .card:hover {
+            border-color: var(--blue);
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+        .card .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        .card .card-desc {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-top: 4px;
+        }
+        .card .card-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--blue);
+            margin-top: 6px;
+        }
+        .card .card-badge {
+            position: absolute;
+            top: -9px;
+            right: 12px;
+            background: var(--gold);
+            color: var(--white);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+        .card.recommended {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: var(--white);
+            box-shadow: 0 6px 24px rgba(46, 117, 182, 0.3);
+            transform: scale(1.02);
+        }
+        .card.recommended .card-title {
+            color: var(--white);
+        }
+        .card.recommended .card-desc {
+            color: rgba(255,255,255,0.85);
+        }
+        .card.recommended .card-badge {
+            background: var(--gold);
+        }
+        .card.recommended:hover {
+            background: var(--blue-dark);
+            border-color: var(--blue-dark);
+            box-shadow: 0 8px 32px rgba(46, 117, 182, 0.4);
+        }
+
+        /* ── Info box ── */
+        .info-box {
+            background: var(--blue-light);
+            border-left: 3px solid var(--blue);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--dark);
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        /* ── Summary page ── */
+        .summary-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .summary-header {
+            background: linear-gradient(135deg, var(--dark), var(--blue-dark));
+            padding: 20px 24px;
+            color: var(--white);
+            text-align: center;
+        }
+        .summary-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .summary-body {
+            padding: 20px 24px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 14px;
+        }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-row .label { color: var(--gray-500); }
+        .summary-row .value { font-weight: 600; color: var(--dark); }
+
+        /* ── Price card ── */
+        .price-card {
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            color: var(--white);
+            box-shadow: 0 8px 32px rgba(46, 117, 182, 0.25);
+            margin-bottom: 16px;
+        }
+        .price-card .price-label {
+            font-size: 13px;
+            opacity: 0.8;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .price-card .price-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin: 8px 0;
+        }
+        .price-card .price-unit {
+            font-size: 18px;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+        .price-card .price-monthly {
+            font-size: 14px;
+            opacity: 0.75;
+            margin-top: 4px;
+        }
+        .price-card .savings-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* ── Breakdown ── */
+        .breakdown {
+            background: var(--gray-100);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+        .breakdown-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            padding: 6px 0;
+        }
+        .breakdown-row .month-label { color: var(--gray-700); }
+        .breakdown-row .month-price { font-weight: 600; }
+        .breakdown-row.discount .month-price { color: var(--green); }
+
+        /* ── Course info ── */
+        .course-info {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px 24px;
+            margin-bottom: 16px;
+        }
+        .course-info h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 12px;
+        }
+        .course-info ul {
+            list-style: none;
+            padding: 0;
+        }
+        .course-info li {
+            font-size: 13px;
+            color: var(--gray-700);
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .course-info li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--blue);
+            font-weight: 700;
+        }
+
+        /* ── Buttons ── */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .btn-primary {
+            background: var(--blue);
+            color: var(--white);
+        }
+        .btn-primary:hover {
+            background: var(--blue-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(46, 117, 182, 0.3);
+        }
+        .btn-secondary {
+            background: var(--white);
+            color: var(--dark);
+            border: 2px solid var(--gray-200);
+        }
+        .btn-secondary:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+        .btn-back {
+            background: none;
+            border: none;
+            color: var(--gray-500);
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            padding: 8px 0;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+        .btn-back:hover { color: var(--blue); }
+        .btn-back svg { width: 16px; height: 16px; }
+
+        /* ── Start page ── */
+        .start-page {
+            text-align: center;
+            padding: 40px 0 20px;
+        }
+        .start-page .tagline {
+            font-size: 15px;
+            color: var(--gray-500);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+        .start-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .start-card {
+            background: var(--white);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .start-card:hover {
+            border-color: var(--blue);
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+        .start-card .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .start-card .icon.blue { background: var(--blue-light); }
+        .start-card .icon.gold { background: var(--gold-light); }
+        .start-card .icon.green { background: var(--green-light); }
+        .start-card .sc-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        .start-card .sc-desc {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-top: 2px;
+        }
+        .start-card .sc-price {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--blue);
+            margin-top: 4px;
+        }
+
+        /* ── Instant result ── */
+        .instant-result {
+            animation: fadeUp 0.35s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+var APP = document.getElementById("app");
+
+// ── CONFIG ──
+const PRODUCTS = {
+    conversation: {
+        name: "일반 회화 / 시사 뉴스",
+        nameShort: "전화 불어 수업",
+        basePrice: 75000,
+        durations: ["15분", "30분"],
+        frequencies: ["1회", "2회", "3회"],
+        commitments: [
+            { label: "2개월", months: 2, discount: 0, tag: "추천", recommended: true },
+            { label: "4개월", months: 4, discount: 0, tag: "최저가" },
+            { label: "1개월", months: 1, discount: 0, tag: null },
+        ],
+        tiers: {
+            1: 85000,
+            2: 75000,
+            4: 68000,
+        }
+    },
+    delf: {
+        levels: [
+            { label: "DELF B1", price: 85000 },
+            { label: "DELF B2", price: 90000 },
+            { label: "DALF C1", price: 95000 },
+            { label: "DALF C2", price: 100000 },
+        ],
+        format: "주 2회 · 30분 · 2개월 (16회)",
+        minMonths: 2,
+    },
+    trial: { price: 10000, duration: "15분" },
+    voyage: { price: 90000, duration: "60분" },
+};
+
+const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
+const COURSE_TYPES = [
+    { key: "general", label: "일반 회화", desc: "테마별 자유 토론" },
+    { key: "news", label: "시사 뉴스", desc: "뉴스 기사 기반 토론", minLevel: "B1" },
+];
+
+// ── STATE ──
+window.state = { path: null, step: 0, choices: {} };
+var state = window.state;
+
+// ── RENDER ──
+window.render = function() {
+    APP.innerHTML = "";
+    if (!state.path) return renderStart();
+    if (state.path === "trial") return renderTrial();
+    if (state.path === "voyage") return renderVoyage();
+    if (state.path === "delf") return renderDelf();
+    if (state.path === "conversation") return renderConversation();
+}
+var render = window.render;
+
+// ── START PAGE ──
+function renderStart() {
+    const div = el("div", "");
+    div.innerHTML = `
+        <div class="header">
+            <div class="header-logo">callmeparis.</div>
+            <div class="header-sub">전화불어 · 불어과외 · DELF-DALF 전문</div>
+        </div>
+        <div class="start-page">
+            <p class="tagline">원하시는 수업을 선택하세요</p>
+            <div class="start-options" id="start-options"></div>
+        </div>
+    `;
+    APP.appendChild(div);
+
+    const opts = div.querySelector("#start-options");
+    const items = [
+        { path: "conversation", icon: "📞", iconClass: "blue", title: "[전화] 프랑스어 연습", desc: "일반 회화 · 시사 뉴스", price: "15분 또는 30분" },
+        { path: "delf", icon: "🎓", iconClass: "gold", title: "[전화] DELF/DALF 구술 시험 실전 연습", desc: "B1 · B2 · C1 · C2", price: "주 2회 · 30분" },
+        { path: "trial", icon: "✨", iconClass: "green", title: "[전화] 체험 수업", desc: "15분 · 레벨 맞춤", price: "10,000원" },
+        { path: "voyage", icon: "✈️", iconClass: "blue", title: "[전화] 여행 프랑스어 특강", desc: "1시간 · 실전 회화", price: "90,000원" },
+    ];
+    items.forEach(item => {
+        const card = el("div", "start-card");
+        card.innerHTML = `
+            <div class="icon ${item.iconClass}">${item.icon}</div>
+            <div>
+                <div class="sc-title">${item.title}</div>
+                <div class="sc-desc">${item.desc}</div>
+                <div class="sc-price">${item.price}</div>
+            </div>
+        `;
+        card.onclick = () => { state.path = item.path; state.step = 0; state.choices = {}; render(); };
+        opts.appendChild(card);
+    });
+}
+
+// ── VOYAGE ──
+function renderVoyage() {
+    const div = el("div", "instant-result");
+    div.innerHTML = `
+        <div class="header">
+            <div class="header-logo">callmeparis.</div>
+        </div>
+    `;
+    APP.appendChild(div);
+
+    addBackBtn(div, () => { state.path = null; render(); });
+
+    const priceCard = el("div", "price-card");
+    priceCard.innerHTML = `
+        <div class="price-label">[전화] 여행 프랑스어 특강</div>
+        <div class="price-value">${fmt(PRODUCTS.voyage.price)} <span class="price-unit">원</span></div>
+        <div class="price-monthly">60분 · 1회</div>
+    `;
+    div.appendChild(priceCard);
+
+    const info = el("div", "course-info");
+    info.innerHTML = `
+        <h4>수업 내용</h4>
+        <p style="font-size:13px;color:var(--gray-700);margin-bottom:14px;">다음 상황에서 혼자서도 프랑스어로 대응할 수 있습니다.</p>
+
+        <div style="margin-bottom:12px;">
+            <div style="font-weight:700;font-size:14px;margin-bottom:6px;">🥖 빵집 / 카페</div>
+            <ul>
+                <li>주문하기</li>
+                <li>가격 묻기</li>
+                <li>카드·현금 결제하기</li>
+            </ul>
+        </div>
+
+        <div style="margin-bottom:12px;">
+            <div style="font-weight:700;font-size:14px;margin-bottom:6px;">🍽 레스토랑</div>
+            <ul>
+                <li>메뉴 고르기</li>
+                <li>음식 주문하기</li>
+                <li>빼달라고 말하기</li>
+                <li>계산서 요청하기</li>
+            </ul>
+        </div>
+
+        <div style="margin-bottom:12px;">
+            <div style="font-weight:700;font-size:14px;margin-bottom:6px;">🏨 호텔</div>
+            <ul>
+                <li>체크인 / 체크아웃</li>
+                <li>아침 식사 시간 묻기</li>
+                <li>방에 문제가 있을 때 말하기</li>
+            </ul>
+        </div>
+
+        <div style="margin-bottom:12px;">
+            <div style="font-weight:700;font-size:14px;margin-bottom:6px;">🎟 관광지</div>
+            <ul>
+                <li>입장권 구매</li>
+                <li>요금 / 할인 / 운영 시간 묻기</li>
+                <li>오디오 가이드, 사진 촬영 가능 여부 묻기</li>
+            </ul>
+        </div>
+
+        <div style="margin-bottom:12px;">
+            <div style="font-weight:700;font-size:14px;margin-bottom:6px;">🆘 여행 중 긴급 상황</div>
+            <ul>
+                <li>길을 잃었을 때</li>
+                <li>문제가 생겼을 때</li>
+                <li>도움 요청하기</li>
+                <li>기본적인 예의 표현 사용하기</li>
+            </ul>
+        </div>
+
+        <div class="info-box" style="margin-top:12px">출국 전 실전 프랑스어 1시간 집중 수업. 수업 전 PDF 학습 자료가 제공됩니다.</div>
+    `;
+    div.appendChild(info);
+
+    const btnGroup = el("div", "btn-group");
+    btnGroup.innerHTML = `
+        <button class="btn btn-primary" onclick="window.open('https://pf.kakao.com/_xnxdDxmT','_blank')">카카오로 신청하기</button>
+        <button class="btn btn-secondary" onclick="state.path=null;render()">다른 수업 보기</button>
+    `;
+    div.appendChild(btnGroup);
+}
+
+// ── TRIAL FLOW ──
+function renderTrial() {
+    const div = el("div", "step-wrapper");
+    div.innerHTML = `<div class="header"><div class="header-logo">callmeparis.</div></div>`;
+    APP.appendChild(div);
+
+    addBackBtn(div, () => {
+        if (state.step > 0) { state.step--; render(); }
+        else { state.path = null; render(); }
+    });
+
+    addProgress(div, state.step, 1);
+
+    if (state.step === 0) {
+        addTitle(div, "체험 수업 유형을 선택하세요");
+        const cards = el("div", "cards");
+
+        const card1 = mkCard("일반 회화", "💬 주제별 대화하고 싶으시면", null);
+        card1.onclick = () => { state.choices.trialType = "일반 회화"; state.step++; render(); };
+        cards.appendChild(card1);
+
+        const card2 = mkCard("시사 뉴스", "🗞️ 기사를 읽고 대화하고 싶으시면", null);
+        card2.onclick = () => { state.choices.trialType = "시사 뉴스"; state.step++; render(); };
+        cards.appendChild(card2);
+
+        div.appendChild(cards);
+    }
+    else {
+        // Summary
+        const trialType = state.choices.trialType;
+        const isNews = trialType === "시사 뉴스";
+
+        const pc = el("div", "price-card");
+        pc.innerHTML = `
+            <div class="price-label">[전화] 체험 수업 · ${trialType}</div>
+            <div class="price-value">${fmt(PRODUCTS.trial.price)} <span class="price-unit">원</span></div>
+            <div class="price-monthly">15분 · 1회</div>
+        `;
+        div.appendChild(pc);
+
+        const sc = el("div", "summary-card");
+        sc.innerHTML = `
+            <div class="summary-header"><h3>수강 요약</h3></div>
+            <div class="summary-body">
+                <div class="summary-row"><span class="label">유형</span><span class="value">${trialType}</span></div>
+                <div class="summary-row"><span class="label">시간</span><span class="value">15분</span></div>
+                <div class="summary-row"><span class="label">수업 전 자료</span><span class="value">${isNews ? "프랑스어 기사 전달" : "테마별 질문 PDF 전달"}</span></div>
+            </div>
+        `;
+        div.appendChild(sc);
+
+        const info = el("div", "course-info");
+        if (isNews) {
+            info.innerHTML = `
+                <h4>📰 시사 뉴스 체험 수업</h4>
+                <ul>
+                    <li>수업 전 프랑스어 기사 이메일 전달</li>
+                    <li>기사 내용에 대해 자유롭게 대화</li>
+                    <li>레벨 진단 + 맞춤 피드백</li>
+                </ul>
+            `;
+        } else {
+            info.innerHTML = `
+                <h4>📞 일반 회화 체험 수업</h4>
+                <ul>
+                    <li>수업 전 테마별 질문 PDF 전달</li>
+                    <li>자기소개 + 테마 대화</li>
+                    <li>레벨 진단 + 맞춤 피드백</li>
+                </ul>
+            `;
+        }
+        div.appendChild(info);
+
+        addCTA(div);
+    }
+}
+
+// ── INSTANT RESULT (trial / voyage) ──
+function renderInstant(title, duration, price, features, note) {
+    const div = el("div", "instant-result");
+    div.innerHTML = `
+        <div class="header">
+            <div class="header-logo">callmeparis.</div>
+        </div>
+    `;
+    APP.appendChild(div);
+
+    addBackBtn(div, () => { state.path = null; render(); });
+
+    const priceCard = el("div", "price-card");
+    priceCard.innerHTML = `
+        <div class="price-label">${title}</div>
+        <div class="price-value">${fmt(price)} <span class="price-unit">원</span></div>
+        <div class="price-monthly">${duration} · 1회</div>
+    `;
+    div.appendChild(priceCard);
+
+    const info = el("div", "course-info");
+    info.innerHTML = `
+        <h4>수업 내용</h4>
+        <ul>${features.split(" · ").map(f => `<li>${f}</li>`).join("")}</ul>
+        <div class="info-box" style="margin-top:12px">${note}</div>
+    `;
+    div.appendChild(info);
+
+    const btnGroup = el("div", "btn-group");
+    btnGroup.innerHTML = `
+        <button class="btn btn-primary" onclick="window.open('https://pf.kakao.com/_xnxdDxmT','_blank')">카카오로 신청하기</button>
+        <button class="btn btn-secondary" onclick="state.path=null;render()">다른 수업 보기</button>
+    `;
+    div.appendChild(btnGroup);
+}
+
+// ── DELF FLOW ──
+function renderDelf() {
+    const div = el("div", "step-wrapper");
+    div.innerHTML = `<div class="header"><div class="header-logo">callmeparis.</div></div>`;
+    APP.appendChild(div);
+
+    addBackBtn(div, () => {
+        if (state.step > 0) { state.step--; render(); }
+        else { state.path = null; render(); }
+    });
+
+    // Progress
+    const totalSteps = 2; // level, firstTime
+    addProgress(div, state.step, totalSteps);
+
+    if (state.step === 0) {
+        // Choose DELF level
+        addTitle(div, "DELF/DALF 레벨을 선택하세요");
+        const cards = el("div", "cards");
+        PRODUCTS.delf.levels.forEach(lvl => {
+            const card = mkCard(lvl.label, `2개월 과정`, null);
+            card.onclick = () => { state.choices.delfLevel = lvl; state.step++; render(); };
+            cards.appendChild(card);
+        });
+        div.appendChild(cards);
+        addInfoBox(div, "주 2회 · 30분 · 2개월 최소 (16회) · PDF 자료 + 피드백 + 주간 리포트");
+    }
+    else if (state.step === 1) {
+        addTitle(div, "첫 등록이신가요?");
+        addSubtitle(div, "첫 달 15% 할인 (카카오 채널 친구 추가 시)");
+        const cards = el("div", "cards grid-2");
+        [{ label: "예", val: true }, { label: "아니오", val: false }].forEach(opt => {
+            const card = mkCard(opt.label, opt.val ? "15% 첫 달 할인" : "", null);
+            card.onclick = () => { state.choices.firstTime = opt.val; state.step++; render(); };
+            cards.appendChild(card);
+        });
+        div.appendChild(cards);
+    }
+    else {
+        // Summary
+        renderDelfSummary(div);
+    }
+}
+
+function renderDelfSummary(container) {
+    const lvl = state.choices.delfLevel;
+    const firstTime = state.choices.firstTime;
+    const months = PRODUCTS.delf.minMonths;
+    const hoursPerMonth = 4; // 2x/week * 30min * 4 weeks = 4h
+
+    const month1Rate = firstTime ? lvl.price * 0.85 : lvl.price;
+    const month1 = month1Rate * hoursPerMonth;
+    const monthN = lvl.price * hoursPerMonth;
+    const total = month1 + (months - 1) * monthN;
+    const rounded = roundPrice(total);
+    const savings = firstTime ? (lvl.price * hoursPerMonth * months) - rounded : 0;
+
+    // Price card
+    const pc = el("div", "price-card");
+    pc.innerHTML = `
+        <div class="price-label">[전화] ${lvl.label} 구술 시험 실전 연습 · ${months}개월</div>
+        <div class="price-value">${fmt(rounded)} <span class="price-unit">원</span></div>
+        <div class="price-monthly">월 평균 ${fmt(Math.round(rounded / months))}원</div>
+        ${savings > 0 ? `<div class="savings-tag">절약 ${fmt(Math.round(savings))}원</div>` : ""}
+    `;
+    container.appendChild(pc);
+
+    // Breakdown
+    if (firstTime) {
+        const bd = el("div", "breakdown");
+        bd.innerHTML = `
+            <div class="breakdown-title">월별 상세</div>
+            <div class="breakdown-row discount"><span class="month-label">1개월 차 (15% 할인)</span><span class="month-price">${fmt(roundPrice(month1))}원</span></div>
+            <div class="breakdown-row"><span class="month-label">2개월 차</span><span class="month-price">${fmt(roundPrice(monthN))}원</span></div>
+        `;
+        container.appendChild(bd);
+    }
+
+    // Summary
+    const sc = el("div", "summary-card");
+    sc.innerHTML = `
+        <div class="summary-header"><h3>수강 요약</h3></div>
+        <div class="summary-body">
+            <div class="summary-row"><span class="label">과정</span><span class="value">${lvl.label} 구술 시험 실전 연습</span></div>
+            <div class="summary-row"><span class="label">형식</span><span class="value">주 2회 · 30분</span></div>
+            <div class="summary-row"><span class="label">기간</span><span class="value">${months}개월 (16회)</span></div>
+            <div class="summary-row"><span class="label">첫 달 할인</span><span class="value">${firstTime ? "15% 적용" : "해당 없음"}</span></div>
+            <div class="summary-row"><span class="label">포함</span><span class="value">PDF 자료 + 피드백 + 주간 리포트</span></div>
+        </div>
+    `;
+    container.appendChild(sc);
+
+    // 과정 목표
+    const goals = el("div", "course-info");
+    goals.innerHTML = `
+        <h4>🎯 과정 목표</h4>
+        <ul>
+            <li>${lvl.label} 구술 시험의 복잡한 주제와 고급 어휘에 대한 이해와 사용 능력 향상</li>
+            <li>논리적이고 설득력 있는 대화 구성 능력 개발</li>
+            <li>시험 당일 긴장감 관리 및 자신감 향상</li>
+        </ul>
+    `;
+    container.appendChild(goals);
+
+    // 과정 차별점
+    const diff = el("div", "course-info");
+    diff.innerHTML = `
+        <h4>💡 과정 차별점</h4>
+        <div style="margin-bottom:12px;">
+            <div style="font-weight:700;font-size:14px;margin-bottom:6px;">1️⃣ 프랑스 파리 출신 원어민 강사의 전문성</div>
+            <ul>
+                <li>14년 강의 경력 (관공서, 대학, 사립 어학원 등)</li>
+                <li>누적 강의: +12,000시간</li>
+                <li>누적 학생: +1,200명</li>
+                <li>14년 경력의 DELF/DALF 전문 채점관으로서 시험에 특화된 과정 진행</li>
+            </ul>
+        </div>
+        <div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:6px;">2️⃣ 어법/어휘/문장 구성/개선 방향</div>
+            <ul>
+                <li>조언을 통해 강점 파악과 약점 개선</li>
+                <li>시뮬레이션 종료 후 종합적인 피드백 제공</li>
+            </ul>
+        </div>
+    `;
+    container.appendChild(diff);
+
+    addCTA(container);
+}
+
+// ── CONVERSATION FLOW ──
+function renderConversation() {
+    const div = el("div", "step-wrapper");
+    div.innerHTML = `<div class="header"><div class="header-logo">callmeparis.</div></div>`;
+    APP.appendChild(div);
+
+    addBackBtn(div, () => {
+        if (state.step > 0) { state.step--; render(); }
+        else { state.path = null; render(); }
+    });
+
+    const totalSteps = 6;
+    addProgress(div, state.step, totalSteps);
+
+    const steps = ["level", "courseType", "duration", "frequency", "firstTime", "commitment"];
+
+    if (state.step === 0) {
+        addTitle(div, "본인의 불어 실력을 선택하세요");
+        const cards = el("div", "cards grid-3");
+        LEVELS.forEach(lvl => {
+            const card = mkCard(lvl, "", null);
+            card.onclick = () => { state.choices.level = lvl; state.step++; render(); };
+            cards.appendChild(card);
+        });
+        div.appendChild(cards);
+    }
+    else if (state.step === 1) {
+        addTitle(div, "수업 과정을 선택하세요");
+        const cards = el("div", "cards");
+        const levelIdx = LEVELS.indexOf(state.choices.level);
+        COURSE_TYPES.forEach(ct => {
+            if (ct.minLevel && levelIdx < LEVELS.indexOf(ct.minLevel)) return;
+            const card = mkCard(ct.label, ct.desc, null);
+            card.onclick = () => { state.choices.courseType = ct.label; state.step++; render(); };
+            cards.appendChild(card);
+        });
+        if (levelIdx < 2) {
+            addInfoBox(div, "A1·A2 레벨에서는 일반 회화 과정만 이용 가능합니다.");
+        }
+        div.appendChild(cards);
+    }
+    else if (state.step === 2) {
+        addTitle(div, "수업 시간을 선택하세요");
+        const cards = el("div", "cards grid-2");
+        PRODUCTS.conversation.durations.forEach(d => {
+            const card = mkCard(d, d === "15분" ? "짧고 집중적인" : "깊이 있는 대화", null);
+            card.onclick = () => { state.choices.duration = d; state.step++; render(); };
+            cards.appendChild(card);
+        });
+        div.appendChild(cards);
+    }
+    else if (state.step === 3) {
+        addTitle(div, "주당 수업 횟수를 선택하세요");
+        const cards = el("div", "cards grid-3");
+        PRODUCTS.conversation.frequencies.forEach(f => {
+            const card = mkCard(f, "", null);
+            card.onclick = () => { state.choices.frequency = f; state.step++; render(); };
+            cards.appendChild(card);
+        });
+        div.appendChild(cards);
+    }
+    else if (state.step === 4) {
+        addTitle(div, "첫 등록이신가요?");
+        addSubtitle(div, "첫 달 15% 할인 (카카오 채널 친구 추가 시)");
+        const cards = el("div", "cards grid-2");
+        [{ label: "예", val: true }, { label: "아니오", val: false }].forEach(opt => {
+            const card = mkCard(opt.label, opt.val ? "15% 첫 달 할인" : "", null);
+            card.onclick = () => { state.choices.firstTime = opt.val; state.step++; render(); };
+            cards.appendChild(card);
+        });
+        div.appendChild(cards);
+    }
+    else if (state.step === 5) {
+        addTitle(div, "등록 기간을 선택하세요");
+        const cards = el("div", "cards");
+        PRODUCTS.conversation.commitments.forEach(c => {
+            const tier = PRODUCTS.conversation.tiers[c.months];
+            const card = mkCard(
+                c.label,
+                c.months === 2 ? "가장 인기 있는 플랜" : c.months === 4 ? "1개월 대비 -20% · 최저가" : "부담 없이 시작",
+                c.tag
+            );
+            if (c.recommended) card.classList.add("recommended");
+            card.onclick = () => { state.choices.commitment = c; state.step++; render(); };
+            cards.appendChild(card);
+        });
+        div.appendChild(cards);
+    }
+    else {
+        renderConversationSummary(div);
+    }
+}
+
+function renderConversationSummary(container) {
+    const ch = state.choices;
+    const commitment = ch.commitment;
+    const months = commitment.months;
+    const tier = PRODUCTS.conversation.tiers[months];
+    const durMin = parseInt(ch.duration);
+    const freq = parseInt(ch.frequency);
+    const hoursPerMonth = (durMin * freq * 4) / 60;
+
+    const monthlyBase = tier * hoursPerMonth;
+    const month1 = ch.firstTime ? monthlyBase * 0.85 : monthlyBase;
+    const total = month1 + (months > 1 ? (months - 1) * monthlyBase : 0);
+    const rounded = roundPrice(total);
+    const fullPrice = PRODUCTS.conversation.tiers[1] * hoursPerMonth * months; // vs mensuel sans remise
+    const savings = fullPrice - rounded;
+
+    const pc = el("div", "price-card");
+    pc.innerHTML = `
+        <div class="price-label">[전화] 프랑스어 연습 · ${commitment.label}</div>
+        <div class="price-value">${fmt(rounded)} <span class="price-unit">원</span></div>
+        ${months > 1 ? `<div class="price-monthly">월 평균 ${fmt(Math.round(rounded / months))}원</div>` : ""}
+        ${savings > 0 ? `<div class="savings-tag">절약 ${fmt(Math.round(savings))}원</div>` : ""}
+    `;
+    container.appendChild(pc);
+
+    // Monthly breakdown
+    if (months > 1 || ch.firstTime) {
+        const bd = el("div", "breakdown");
+        let html = `<div class="breakdown-title">월별 상세</div>`;
+        if (ch.firstTime) {
+            html += `<div class="breakdown-row discount"><span class="month-label">1개월 차 (15% 할인)</span><span class="month-price">${fmt(roundPrice(month1))}원</span></div>`;
+        }
+        if (months > 1) {
+            const startMonth = ch.firstTime ? 2 : 1;
+            html += `<div class="breakdown-row"><span class="month-label">${startMonth}~${months}개월 차</span><span class="month-price">${fmt(roundPrice(monthlyBase))}원/월</span></div>`;
+        }
+        bd.innerHTML = html;
+        container.appendChild(bd);
+    }
+
+    // Summary card
+    const sc = el("div", "summary-card");
+    sc.innerHTML = `
+        <div class="summary-header"><h3>수강 요약</h3></div>
+        <div class="summary-body">
+            <div class="summary-row"><span class="label">레벨</span><span class="value">${ch.level}</span></div>
+            <div class="summary-row"><span class="label">과정</span><span class="value">${ch.courseType}</span></div>
+            <div class="summary-row"><span class="label">수업 시간</span><span class="value">${ch.duration}</span></div>
+            <div class="summary-row"><span class="label">주당 횟수</span><span class="value">${ch.frequency}</span></div>
+            <div class="summary-row"><span class="label">등록 기간</span><span class="value">${commitment.label}</span></div>
+            <div class="summary-row"><span class="label">첫 달 할인</span><span class="value">${ch.firstTime ? "15% 적용" : "해당 없음"}</span></div>
+            <div class="summary-row"><span class="label">포함</span><span class="value">PDF 자료 + 피드백</span></div>
+        </div>
+    `;
+    container.appendChild(sc);
+
+    // Course details
+    const courseInfo = el("div", "course-info");
+    if (ch.courseType === "일반 회화") {
+        courseInfo.innerHTML = `
+            <h4>📞 일반 회화 과정</h4>
+            <ul>
+                <li>회화 실력 향상</li>
+                <li>발음 교정</li>
+                <li>문법 · 어휘 향상</li>
+                <li>문화 이해 향상</li>
+                <li>DELF·DALF 대비</li>
+            </ul>
+        `;
+    } else {
+        courseInfo.innerHTML = `
+            <h4>📰 시사 뉴스 과정</h4>
+            <ul>
+                <li>뉴스 기사 기반 토론</li>
+                <li>회화 · 발음 향상</li>
+                <li>고급 어휘 습득</li>
+                <li>문화 이해 향상</li>
+                <li>DELF·DALF 대비</li>
+            </ul>
+        `;
+    }
+    container.appendChild(courseInfo);
+
+    addCTA(container);
+}
+
+// ── UTILITIES ──
+function el(tag, className) {
+    const e = document.createElement(tag);
+    if (className) e.className = className;
+    return e;
+}
+
+function mkCard(title, desc, badge) {
+    const card = el("div", "card");
+    let html = `<div class="card-title">${title}</div>`;
+    if (desc) html += `<div class="card-desc">${desc}</div>`;
+    if (badge) html = `<div class="card-badge">${badge}</div>` + html;
+    card.innerHTML = html;
+    return card;
+}
+
+function addTitle(container, text) {
+    const t = el("div", "step-title");
+    t.textContent = text;
+    container.appendChild(t);
+}
+
+function addSubtitle(container, text) {
+    const s = el("div", "step-subtitle");
+    s.textContent = text;
+    container.appendChild(s);
+}
+
+function addInfoBox(container, text) {
+    const box = el("div", "info-box");
+    box.textContent = text;
+    container.appendChild(box);
+}
+
+function addProgress(container, current, total) {
+    const bar = el("div", "progress-bar");
+    for (let i = 0; i < total; i++) {
+        const seg = el("div", "progress-segment");
+        if (i < current) seg.classList.add("done");
+        else if (i === current) seg.classList.add("active");
+        bar.appendChild(seg);
+    }
+    container.appendChild(bar);
+}
+
+function addBackBtn(container, onClick) {
+    const btn = el("button", "btn-back");
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> 뒤로`;
+    btn.onclick = onClick;
+    container.appendChild(btn);
+}
+
+function addCTA(container) {
+    const title = el("div", "step-title");
+    title.style.fontSize = "16px";
+    title.style.marginTop = "16px";
+    title.textContent = "등록을 원하시면 스크린샷을 찍고 카카오 채널로 보내주세요!";
+    container.appendChild(title);
+
+    const btnGroup = el("div", "btn-group");
+    btnGroup.innerHTML = `
+        <button class="btn btn-primary" onclick="window.open('https://pf.kakao.com/_xnxdDxmT','_blank')">🚀 카카오로 신청하기</button>
+        <button class="btn btn-secondary" onclick="state.path=null;state.step=0;state.choices={};render()">⏪ 다시하기</button>
+    `;
+    container.appendChild(btnGroup);
+}
+
+function fmt(n) {
+    return new Intl.NumberFormat("ko-KR").format(Math.round(n));
+}
+
+function roundPrice(price) {
+    return Math.round(price / 1000) * 1000;
+}
+
+// ── INIT ──
+window.render();
+
+}); // end DOMContentLoaded
+</script>
+
+</body>
+</html>
